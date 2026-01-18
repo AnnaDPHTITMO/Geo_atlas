@@ -428,7 +428,6 @@
                             <tr>
                                 <th>Название</th>
                                 <th>Категория</th>
-                                <th>Координаты</th>
                                 <th>Тип</th>
                             </tr>
                         </thead>
@@ -502,7 +501,19 @@
     <div class="tooltip" id="tooltip"></div>
 
     <script>
-        // Данные объектов с координатами (широта, долгота)
+        // Данные объектов с координатами
+        // 
+        // СПОСОБ 1: Использование географических координат (lat/lon)
+        //   { name: 'Название', lat: 50, lon: 40, type: 'тип' }
+        //   lat: широта от -90 (юг) до 90 (север)
+        //   lon: долгота от -180 (запад) до 180 (восток)
+        //
+        // СПОСОБ 2: Использование прямых пиксельных координат (x/y)
+        //   { name: 'Название', x: 500, y: 300, type: 'тип' }
+        //   x: координата X в пикселях (от 0 до ширины карты)
+        //   y: координата Y в пикселях (от 0 до высоты карты)
+        //   Чтобы узнать пиксельные координаты, наведите мышь на карту - они отображаются в координатном дисплее
+        //
         const objectsData = {
             'Система координат': [
                 { name: 'Северный полюс', lat: 90, lon: 40, type: 'точка' },
@@ -543,7 +554,7 @@
                 { name: 'Кавказские горы', lat: 43, lon: 44, type: 'горы' },
                 { name: 'Альпы', lat: 46, lon: 10, type: 'горы' },
                 { name: 'Гималаи', lat: 28, lon: 84, type: 'горы' },
-                { name: 'Кордильеры', lat: 50, lon: -105, type: 'горы' },
+                { name: 'Кордильеры', x: 154, y: 145, type: 'горы' },
                 { name: 'Анды', lat: -20, lon: -70, type: 'горы' },
                 { name: 'Восточно-Европейская равнина', lat: 50, lon: 25, type: 'равнина' },
                 { name: 'Западно-Сибирская равнина', lat: 65, lon: 75, type: 'равнина' }
@@ -904,12 +915,10 @@
 
                     visibleCount++;
                     const row = document.createElement('tr');
-                    const coords = `${Math.abs(obj.lat)}°${obj.lat >= 0 ? 'N' : 'S'} ${Math.abs(obj.lon)}°${obj.lon >= 0 ? 'E' : 'W'}`;
                     
                     row.innerHTML = `
                         <td><strong>${obj.name}</strong></td>
                         <td><span class="category-badge">${category}</span></td>
-                        <td>${coords}</td>
                         <td><span class="category-badge ${getBadgeClass(obj.type)}">${obj.type}</span></td>
                     `;
                     
@@ -972,7 +981,19 @@
                 objects.forEach(obj => {
                     if (currentSearch && !obj.name.toLowerCase().includes(currentSearch.toLowerCase())) {
                         return;
-                    }                        const pixels = coordsToPixels(obj.lat, obj.lon, svgWidth, svgHeight);
+                    }
+                    
+                    // Поддержка как географических координат (lat/lon), так и прямых пиксельных координат (x/y)
+                    let pixels;
+                    if (obj.x !== undefined && obj.y !== undefined) {
+                        // Используем прямые пиксельные координаты
+                        pixels = { x: obj.x, y: obj.y };
+                    } else if (obj.lat !== undefined && obj.lon !== undefined) {
+                        // Используем географические координаты (конвертируем в пиксели)
+                        pixels = coordsToPixels(obj.lat, obj.lon, svgWidth, svgHeight);
+                    } else {
+                        return; // Пропускаем объекты без координат
+                    }
 
                     // Проверка, находится ли маркер в пределах видимой области
                     if (pixels.x >= 0 && pixels.x <= svgWidth && pixels.y >= 0 && pixels.y <= svgHeight) {
