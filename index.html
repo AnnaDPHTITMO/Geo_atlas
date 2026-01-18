@@ -228,6 +228,21 @@
             pointer-events: all;
         }
 
+        .coordinate-display {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            z-index: 100;
+            pointer-events: none;
+            user-select: none;
+        }
+
         .zoom-controls {
             display: flex;
             gap: 10px;
@@ -436,8 +451,9 @@
                 </div>
                 <div class="map-wrapper">
                     <div class="map-container" id="map-container">
-                        <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/258ee76b-4834-4b87-a847-9218fabcbb05" alt="Карта мира" class="map-image" id="world-map">
+                        <img src="images/map.jpeg" id="world-map" alt="Карта мира" class="map-image">
                         <svg id="markers-svg" class="svg-overlay"></svg>
+                        <div class="coordinate-display" id="coordinate-display">X: —, Y: —</div>
                     </div>
                 </div>
             </div>
@@ -676,6 +692,41 @@
             document.getElementById('zoom-level').textContent = Math.round(mapZoom * 100);
         }
 
+        // Функция для обновления отображения пиксельных координат
+        function updatePixelCoordinates(e) {
+            const mapContainer = document.getElementById('map-container');
+            const mapImg = document.getElementById('world-map');
+            const coordDisplay = document.getElementById('coordinate-display');
+            const svg = document.getElementById('markers-svg');
+            
+            const rect = mapContainer.getBoundingClientRect();
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            // Проверяем, находится ли мышь над картой
+            if (mouseX >= rect.left && mouseX <= rect.right && 
+                mouseY >= rect.top && mouseY <= rect.bottom) {
+                
+                // Координаты относительно контейнера (с учетом padding 10px)
+                const relativeX = mouseX - rect.left - 10;
+                const relativeY = mouseY - rect.top - 10;
+                
+                // Учитываем панорамирование и масштаб для получения реальных пикселей на изображении
+                const imgX = (relativeX - panX) / mapZoom;
+                const imgY = (relativeY - panY) / mapZoom;
+                
+                // Получаем размеры изображения
+                const svgWidth = parseFloat(svg.getAttribute('width')) || mapImg.offsetWidth;
+                const svgHeight = parseFloat(svg.getAttribute('height')) || mapImg.offsetHeight;
+                
+                // Отображаем координаты (даже если они вне границ изображения)
+                coordDisplay.textContent = `X: ${Math.round(imgX)}, Y: ${Math.round(imgY)}`;
+                coordDisplay.style.display = 'block';
+            } else {
+                coordDisplay.style.display = 'none';
+            }
+        }
+
         // Инициализация обработчиков мыши для карты
         function initMapMouseControls() {
             const mapContainer = document.getElementById('map-container');
@@ -738,6 +789,8 @@
                     panY = startPanY + deltaY;
                     constrainPan();
                     updateMapTransform();
+                    // Обновляем координаты во время перетаскивания
+                    updatePixelCoordinates(e);
                     e.preventDefault();
                 }
             });
@@ -770,6 +823,15 @@
                 if (isDragging) {
                     e.preventDefault();
                 }
+            });
+            
+            // Обработчик движения мыши для отображения пиксельных координат
+            mapContainer.addEventListener('mousemove', updatePixelCoordinates);
+            svg.addEventListener('mousemove', updatePixelCoordinates);
+            
+            // Скрываем координаты при выходе мыши за пределы карты
+            mapContainer.addEventListener('mouseleave', () => {
+                document.getElementById('coordinate-display').style.display = 'none';
             });
         }
 
