@@ -604,7 +604,7 @@
         // Функция для масштабирования карты
         let mapZoom = 1;
         const minZoom = 0.5;
-        const maxZoom = 4;
+        const maxZoom = 6;
         let panX = 0;
         let panY = 0;
         let isDragging = false;
@@ -1006,16 +1006,18 @@
                         group.setAttribute('class', 'marker-group');
                         group.style.cursor = 'pointer';
 
-                        // Создаем круг маркера с масштабированием
-                        const markerRadius = 5 / mapZoom;
+                        // Создаем круг маркера с масштабированием (меньше при увеличении зума)
+                        const baseRadius = 4;
+                        const markerRadius = baseRadius / mapZoom; // Уменьшается при увеличении зума
                         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                         circle.setAttribute('cx', pixels.x);
                         circle.setAttribute('cy', pixels.y);
                         circle.setAttribute('r', markerRadius);
                         circle.setAttribute('fill', color);
                         circle.setAttribute('stroke', 'white');
-                        circle.setAttribute('stroke-width', 2 / mapZoom);
+                        circle.setAttribute('stroke-width', Math.max(0.5, 2 / mapZoom));
                         circle.setAttribute('class', 'marker-circle');
+                        circle.setAttribute('data-base-radius', baseRadius);
 
                         // Создаем текстовую метку (скрытую по умолчанию)
                         const textBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -1035,8 +1037,9 @@
 
                         // Добавляем обработчики событий для интерактивности
                         group.addEventListener('mouseenter', () => {
-                            circle.setAttribute('r', 8);
-                            circle.setAttribute('stroke-width', 3);
+                            const hoverRadius = 6 / mapZoom; // Уменьшается при увеличении зума
+                            circle.setAttribute('r', hoverRadius);
+                            circle.setAttribute('stroke-width', Math.max(0.75, 3 / mapZoom));
                             textBg.style.display = 'block';
                             text.style.display = 'block';
                             
@@ -1046,8 +1049,9 @@
                         });
 
                         group.addEventListener('mouseleave', () => {
-                            circle.setAttribute('r', 5);
-                            circle.setAttribute('stroke-width', 2);
+                            const normalRadius = baseRadius / mapZoom; // Уменьшается при увеличении зума
+                            circle.setAttribute('r', normalRadius);
+                            circle.setAttribute('stroke-width', Math.max(0.5, 2 / mapZoom));
                             textBg.style.display = 'none';
                             text.style.display = 'none';
                             
@@ -1104,8 +1108,9 @@
                 
                 if (shouldHighlight) {
                     const circle = group.querySelector('.marker-circle');
-                    circle.setAttribute('r', 8);
-                    circle.setAttribute('stroke-width', 3);
+                    const highlightRadius = 6 / mapZoom; // Уменьшается при увеличении зума
+                    circle.setAttribute('r', highlightRadius);
+                    circle.setAttribute('stroke-width', Math.max(0.75, 3 / mapZoom));
                     const textBg = group.querySelector('.marker-label-bg');
                     const text = group.querySelector('.marker-label');
                     textBg.style.display = 'block';
@@ -1118,8 +1123,10 @@
             const groups = document.querySelectorAll('.marker-group');
             groups.forEach(group => {
                 const circle = group.querySelector('.marker-circle');
-                circle.setAttribute('r', 5);
-                circle.setAttribute('stroke-width', 2);
+                const baseRadius = 4;
+                const normalRadius = baseRadius / mapZoom; // Уменьшается при увеличении зума
+                circle.setAttribute('r', normalRadius);
+                circle.setAttribute('stroke-width', Math.max(0.5, 2 / mapZoom));
                 const textBg = group.querySelector('.marker-label-bg');
                 const text = group.querySelector('.marker-label');
                 textBg.style.display = 'none';
