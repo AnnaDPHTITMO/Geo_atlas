@@ -229,18 +229,15 @@
         }
 
         .coordinate-display {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
             background: rgba(0, 0, 0, 0.75);
             color: white;
             padding: 6px 12px;
             border-radius: 4px;
             font-size: 12px;
             font-family: 'Courier New', monospace;
-            z-index: 100;
             pointer-events: none;
             user-select: none;
+            margin-left: auto;
         }
 
         .zoom-controls {
@@ -448,12 +445,12 @@
                     <span class="zoom-info">Масштаб: <span id="zoom-level">100</span>%</span>
                     <button class="zoom-btn" onclick="zoomMap('in')">+</button>
                     <button class="zoom-btn" onclick="resetZoom()">Сброс</button>
+                    <div class="coordinate-display" id="coordinate-display">X: —, Y: —</div>
                 </div>
                 <div class="map-wrapper">
                     <div class="map-container" id="map-container">
                         <img src="images/map.jpeg" id="world-map" alt="Карта мира" class="map-image">
                         <svg id="markers-svg" class="svg-overlay"></svg>
-                        <div class="coordinate-display" id="coordinate-display">X: —, Y: —</div>
                     </div>
                 </div>
             </div>
