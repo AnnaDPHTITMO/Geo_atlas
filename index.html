@@ -217,10 +217,15 @@
             height: calc(100% - 20px);
             cursor: grab;
             transform-origin: top left;
+            pointer-events: all;
         }
 
         .svg-overlay.dragging {
             cursor: grabbing;
+        }
+
+        .svg-overlay .marker-group {
+            pointer-events: all;
         }
 
         .zoom-controls {
@@ -675,6 +680,7 @@
         function initMapMouseControls() {
             const mapContainer = document.getElementById('map-container');
             const svg = document.getElementById('markers-svg');
+            let dragStarted = false;
             
             // Обработчик колесика мыши для масштабирования
             mapContainer.addEventListener('wheel', (e) => {
@@ -683,34 +689,64 @@
                 zoomAtPoint(delta, e.clientX, e.clientY);
             }, { passive: false });
             
-            // Обработчики для перетаскивания карты
-            mapContainer.addEventListener('mousedown', (e) => {
-                if (e.button === 0 && !e.target.closest('.marker-group')) { // Левая кнопка мыши, но не на маркере
-                    isDragging = true;
-                    dragStartX = e.clientX;
-                    dragStartY = e.clientY;
-                    startPanX = panX;
-                    startPanY = panY;
-                    mapContainer.classList.add('dragging');
-                    svg.classList.add('dragging');
-                    e.preventDefault(); // Предотвращаем выделение текста при перетаскивании
+            // Функция для начала перетаскивания
+            function startDrag(e) {
+                if (e.button === 0) { // Левая кнопка мыши
+                    // Проверяем, не кликнули ли мы на маркер
+                    const target = e.target;
+                    const isMarker = target.classList.contains('marker-circle') || 
+                                   target.closest('.marker-group') !== null ||
+                                   target.tagName === 'text' ||
+                                   target.classList.contains('marker-label-bg');
+                    
+                    if (!isMarker) {
+                        isDragging = true;
+                        dragStarted = false;
+                        dragStartX = e.clientX;
+                        dragStartY = e.clientY;
+                        startPanX = panX;
+                        startPanY = panY;
+                        mapContainer.classList.add('dragging');
+                        svg.classList.add('dragging');
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            }
+            
+            // Обработчики для перетаскивания карты на контейнере
+            mapContainer.addEventListener('mousedown', startDrag);
+            
+            // Обработчики для перетаскивания на SVG (фон карты)
+            svg.addEventListener('mousedown', (e) => {
+                // Если клик не на маркере, начинаем перетаскивание
+                const target = e.target;
+                if (target === svg || target.tagName === 'svg') {
+                    startDrag(e);
                 }
             });
             
+            // Глобальный обработчик движения мыши
             document.addEventListener('mousemove', (e) => {
                 if (isDragging) {
+                    if (!dragStarted) {
+                        dragStarted = true;
+                    }
                     const deltaX = e.clientX - dragStartX;
                     const deltaY = e.clientY - dragStartY;
                     panX = startPanX + deltaX;
                     panY = startPanY + deltaY;
                     constrainPan();
                     updateMapTransform();
+                    e.preventDefault();
                 }
             });
             
-            document.addEventListener('mouseup', () => {
+            // Глобальный обработчик отпускания мыши
+            document.addEventListener('mouseup', (e) => {
                 if (isDragging) {
                     isDragging = false;
+                    dragStarted = false;
                     mapContainer.classList.remove('dragging');
                     svg.classList.remove('dragging');
                 }
@@ -718,6 +754,19 @@
             
             // Предотвращаем контекстное меню при перетаскивании
             mapContainer.addEventListener('contextmenu', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                }
+            });
+            
+            svg.addEventListener('contextmenu', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                }
+            });
+            
+            // Предотвращаем выделение текста при перетаскивании
+            mapContainer.addEventListener('selectstart', (e) => {
                 if (isDragging) {
                     e.preventDefault();
                 }
@@ -844,6 +893,17 @@
             svg.setAttribute('width', svgWidth);
             svg.setAttribute('height', svgHeight);
             svg.innerHTML = '';
+            
+            // Добавляем прозрачный фон для возможности перетаскивания по всей области SVG
+            const backgroundRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            backgroundRect.setAttribute('x', 0);
+            backgroundRect.setAttribute('y', 0);
+            backgroundRect.setAttribute('width', svgWidth);
+            backgroundRect.setAttribute('height', svgHeight);
+            backgroundRect.setAttribute('fill', 'transparent');
+            backgroundRect.setAttribute('pointer-events', 'all');
+            backgroundRect.style.cursor = 'grab';
+            svg.appendChild(backgroundRect);
 
             let visibleMarkersCount = 0;
 
@@ -921,7 +981,13 @@
                             tooltip.style.top = (e.clientY + 10) + 'px';
                         });
 
-                        group.addEventListener('click', () => {
+                        group.addEventListener('mousedown', (e) => {
+                            // Останавливаем распространение события, чтобы не начать перетаскивание карты
+                            e.stopPropagation();
+                        });
+                        
+                        group.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Предотвращаем клик на карте
                             const rows = document.querySelectorAll('#objects-table tbody tr');
                             rows.forEach(row => {
                                 if (row.querySelector('strong').textContent === obj.name) {
