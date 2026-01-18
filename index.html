@@ -189,6 +189,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .map-container.dragging {
+            cursor: grabbing;
         }
 
         .map-image {
@@ -198,6 +204,9 @@
             border-radius: 4px;
             display: block;
             max-width: 100%;
+            user-select: none;
+            pointer-events: none;
+            -webkit-user-drag: none;
         }
 
         .svg-overlay {
@@ -206,9 +215,12 @@
             left: 10px;
             width: calc(100% - 20px);
             height: calc(100% - 20px);
-            cursor: pointer;
-            transform-origin: top center;
-            transition: transform 0.2s ease;
+            cursor: grab;
+            transform-origin: top left;
+        }
+
+        .svg-overlay.dragging {
+            cursor: grabbing;
         }
 
         .zoom-controls {
@@ -242,10 +254,11 @@
         }
 
         .map-wrapper {
-            overflow: auto;
+            overflow: hidden;
             max-height: 600px;
             border: 1px solid var(--color-border);
             border-radius: 4px;
+            position: relative;
         }
 
         .marker-circle {
@@ -563,30 +576,152 @@
         let mapZoom = 1;
         const minZoom = 0.5;
         const maxZoom = 4;
+        let panX = 0;
+        let panY = 0;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let startPanX = 0;
+        let startPanY = 0;
 
         function zoomMap(direction) {
             const zoomStep = 0.2;
-            if (direction === 'in') {
-                mapZoom = Math.min(mapZoom + zoomStep, maxZoom);
-            } else if (direction === 'out') {
-                mapZoom = Math.max(mapZoom - zoomStep, minZoom);
+            const mapContainer = document.getElementById('map-container');
+            const rect = mapContainer.getBoundingClientRect();
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            zoomAtPoint(direction === 'in' ? zoomStep : -zoomStep, centerX, centerY);
+        }
+
+        function zoomAtPoint(delta, x, y) {
+            const oldZoom = mapZoom;
+            mapZoom = Math.max(minZoom, Math.min(maxZoom, mapZoom + delta));
+            
+            if (mapZoom !== oldZoom) {
+                // Вычисляем новую позицию панорамирования для масштабирования относительно точки мыши
+                const zoomFactor = mapZoom / oldZoom;
+                const mapContainer = document.getElementById('map-container');
+                const rect = mapContainer.getBoundingClientRect();
+                
+                // Координаты относительно контейнера (с учетом padding 10px)
+                const relativeX = x - rect.left - 10;
+                const relativeY = y - rect.top - 10;
+                
+                // Масштабируем относительно точки мыши
+                panX = relativeX - (relativeX - panX) * zoomFactor;
+                panY = relativeY - (relativeY - panY) * zoomFactor;
+                
+                constrainPan();
+                updateMapTransform();
             }
-            updateMapZoom();
         }
 
         function resetZoom() {
             mapZoom = 1;
-            updateMapZoom();
+            panX = 0;
+            panY = 0;
+            updateMapTransform();
         }
 
-        function updateMapZoom() {
+        function constrainPan() {
+            const mapImg = document.getElementById('world-map');
+            const mapContainer = document.getElementById('map-container');
+            
+            // Получаем естественные размеры изображения
+            const naturalWidth = mapImg.naturalWidth || mapImg.offsetWidth;
+            const naturalHeight = mapImg.naturalHeight || mapImg.offsetHeight;
+            
+            // Размеры контейнера с учетом padding (10px с каждой стороны)
+            const containerWidth = mapContainer.offsetWidth - 20;
+            const containerHeight = mapContainer.offsetHeight - 20;
+            
+            // Масштабированные размеры
+            const scaledWidth = naturalWidth * mapZoom;
+            const scaledHeight = naturalHeight * mapZoom;
+            
+            // Если карта меньше контейнера, центрируем её
+            if (scaledWidth <= containerWidth) {
+                panX = (containerWidth - scaledWidth) / 2;
+            } else {
+                // Ограничиваем панорамирование, чтобы не выходить за границы
+                const maxPanX = (scaledWidth - containerWidth) / 2;
+                panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
+            }
+            
+            if (scaledHeight <= containerHeight) {
+                panY = (containerHeight - scaledHeight) / 2;
+            } else {
+                const maxPanY = (scaledHeight - containerHeight) / 2;
+                panY = Math.max(-maxPanY, Math.min(maxPanY, panY));
+            }
+        }
+
+        function updateMapTransform() {
             const mapImg = document.getElementById('world-map');
             const svg = document.getElementById('markers-svg');
-            mapImg.style.transform = `scale(${mapZoom})`;
-            mapImg.style.transformOrigin = 'top center';
-            svg.style.transform = `scale(${mapZoom})`;
-            svg.style.transformOrigin = 'top center';
+            const mapContainer = document.getElementById('map-container');
+            
+            const transform = `translate(${panX}px, ${panY}px) scale(${mapZoom})`;
+            mapImg.style.transform = transform;
+            mapImg.style.transformOrigin = 'top left';
+            svg.style.transform = transform;
+            svg.style.transformOrigin = 'top left';
+            
             document.getElementById('zoom-level').textContent = Math.round(mapZoom * 100);
+        }
+
+        // Инициализация обработчиков мыши для карты
+        function initMapMouseControls() {
+            const mapContainer = document.getElementById('map-container');
+            const svg = document.getElementById('markers-svg');
+            
+            // Обработчик колесика мыши для масштабирования
+            mapContainer.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                zoomAtPoint(delta, e.clientX, e.clientY);
+            }, { passive: false });
+            
+            // Обработчики для перетаскивания карты
+            mapContainer.addEventListener('mousedown', (e) => {
+                if (e.button === 0 && !e.target.closest('.marker-group')) { // Левая кнопка мыши, но не на маркере
+                    isDragging = true;
+                    dragStartX = e.clientX;
+                    dragStartY = e.clientY;
+                    startPanX = panX;
+                    startPanY = panY;
+                    mapContainer.classList.add('dragging');
+                    svg.classList.add('dragging');
+                    e.preventDefault(); // Предотвращаем выделение текста при перетаскивании
+                }
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - dragStartX;
+                    const deltaY = e.clientY - dragStartY;
+                    panX = startPanX + deltaX;
+                    panY = startPanY + deltaY;
+                    constrainPan();
+                    updateMapTransform();
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    mapContainer.classList.remove('dragging');
+                    svg.classList.remove('dragging');
+                }
+            });
+            
+            // Предотвращаем контекстное меню при перетаскивании
+            mapContainer.addEventListener('contextmenu', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                }
+            });
         }
 
         // Функция для получения цвета в зависимости от категории и типа
@@ -913,6 +1048,8 @@
         function refreshView() {
             updateTable();
             updateMap();
+            constrainPan();
+            updateMapTransform();
         }
 
         // Обработчики событий фильтров
@@ -933,12 +1070,21 @@
 
         // Обновляем при загрузке карты
         document.getElementById('world-map').addEventListener('load', function() {
-            setTimeout(refreshView, 100);
+            setTimeout(() => {
+                refreshView();
+                constrainPan();
+                updateMapTransform();
+                initMapMouseControls();
+            }, 100);
         });
 
         // Обновляем размеры при изменении размера окна
         window.addEventListener('resize', () => {
-            setTimeout(refreshView, 100);
+            setTimeout(() => {
+                refreshView();
+                constrainPan();
+                updateMapTransform();
+            }, 100);
         });
 
         // Статистика
@@ -949,6 +1095,18 @@
 
         // Начальная загрузка
         refreshView();
+        updateMapTransform();
+        
+        // Инициализация управления мышью (на случай если карта уже загружена)
+        if (document.getElementById('world-map').complete) {
+            setTimeout(() => {
+                constrainPan();
+                updateMapTransform();
+                initMapMouseControls();
+            }, 100);
+        } else {
+            // Если карта еще не загружена, инициализация произойдет в обработчике load
+        }
     </script>
 </body>
 </html>
