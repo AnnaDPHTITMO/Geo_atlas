@@ -1303,7 +1303,7 @@
                         group.style.cursor = 'pointer';
 
                         // Создаем круг маркера с масштабированием (меньше при увеличении зума)
-                        const baseRadius = 4;
+                        const baseRadius = 7;
                         const markerRadius = baseRadius / mapZoom; // Уменьшается при увеличении зума
                         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                         circle.setAttribute('cx', pixels.x);
