@@ -526,8 +526,8 @@
         //
         const objectsData = {
             'Система координат': [
-                { name: 'Северный полюс', lat: 90, lon: 40, type: 'точка' },
-                { name: 'Южный полюс', lat: -90, lon: 40, type: 'точка' },
+                { name: 'Северный полюс', x: 570, y: 18, type: 'точка' },
+                { name: 'Южный полюс', x: 570, y: 680, type: 'точка' },
                 { name: 'Экватор', lat: 0, lon: 40, type: 'линия' },
                 { name: 'Нулевой меридиан', lat: 0, lon: 0, type: 'линия' },
                 { name: 'Северный тропик', lat: 23.5, lon: 40, type: 'линия' },
@@ -560,34 +560,34 @@
                 { name: 'Южный океан', lat: -70, lon: 40, type: 'океан' }
             ],
             'Горы и равнины': [
-                { name: 'Уральские горы', lat: 60, lon: 60, type: 'горы' },
-                { name: 'Кавказские горы', lat: 43, lon: 44, type: 'горы' },
-                { name: 'Альпы', lat: 46, lon: 10, type: 'горы' },
+                { name: 'Уральские горы', x: 614, y: 124, type: 'горы' },
+                { name: 'Кавказские горы', x: 577, y: 189, type: 'горы' },
+                { name: 'Альпы', x: 484, y: 174, type: 'горы' },
                 { name: 'Гималаи', lat: 28, lon: 84, type: 'горы' },
                 { name: 'Кордильеры', x: 154, y: 145, type: 'горы' },
                 { name: 'Анды', lat: -20, lon: -70, type: 'горы' },
-                { name: 'Восточно-Европейская равнина', lat: 50, lon: 25, type: 'равнина' },
-                { name: 'Западно-Сибирская равнина', lat: 65, lon: 75, type: 'равнина' }
+                { name: 'Восточно-Европейская равнина', x: 538, y: 143, type: 'равнина' },
+                { name: 'Западно-Сибирская равнина', x: 651, y: 114, type: 'равнина' }
             ],
             'Реки и озёра': [
-                { name: 'Волга', lat: 54, lon: 40, type: 'река' },
-                { name: 'Обь', lat: 66, lon: 73, type: 'река' },
-                { name: 'Енисей', lat: 69, lon: 87, type: 'река' },
-                { name: 'Лена', lat: 72, lon: 127, type: 'река' },
-                { name: 'Амур', lat: 53, lon: 128, type: 'река' },
-                { name: 'Нил', lat: 26, lon: 31, type: 'река' },
+                { name: 'Волга', x: 581, y: 165, type: 'река' },
+                { name: 'Обь', x: 627, y: 107, type: 'река' },
+                { name: 'Енисей', x: 668, y: 83, type: 'река' },
+                { name: 'Лена', x: 753, y: 77, type: 'река' },
+                { name: 'Амур', x: 822, y: 139, type: 'река' },
+                { name: 'Нил', x: 544, y: 245, type: 'река' },
                 { name: 'Амазонка', lat: -5, lon: -63, type: 'река' },
-                { name: 'Миссисипи', lat: 35, lon: -92, type: 'река' },
-                { name: 'оз. Байкал', lat: 54, lon: 104, type: 'озеро' },
-                { name: 'Ладожское озеро', lat: 60.8, lon: 32, type: 'озеро' },
-                { name: 'Онежское озеро', lat: 61.5, lon: 34.5, type: 'озеро' }
+                { name: 'Миссисипи', x: 185, y: 209, type: 'река' },
+                { name: 'оз. Байкал', x: 743, y: 134, type: 'озеро' },
+                { name: 'Ладожское озеро', x: 549, y: 120, type: 'озеро' },
+                { name: 'Онежское озеро', x: 559, y: 117, type: 'озеро' }
             ],
             'Моря': [
-                { name: 'Чёрное море', lat: 43, lon: 35, type: 'море' },
-                { name: 'Каспийское море', lat: 45, lon: 50, type: 'море' },
-                { name: 'Балтийское море', lat: 57, lon: 19, type: 'море' },
-                { name: 'Белое море', lat: 65, lon: 40, type: 'море' },
-                { name: 'Баренцево море', lat: 75, lon: 35, type: 'море' },
+                { name: 'Чёрное море', x: 555, y: 188, type: 'море' },
+                { name: 'Каспийское море', x: 598, y: 192, type: 'море' },
+                { name: 'Балтийское море', x: 517, y: 137, type: 'море' },
+                { name: 'Белое море', x: 566, y: 104, type: 'море' },
+                { name: 'Баренцево море', x: 570, y: 64, type: 'море' },
                 { name: 'Средиземное море', lat: 35, lon: 18, type: 'море' },
                 { name: 'Карибское море', lat: 15, lon: -75, type: 'море' }
             ]
@@ -658,11 +658,36 @@
         }
 
         function resetZoom() {
-            mapZoom = 1;
+            const mapImg = document.getElementById('world-map');
+            const mapContainer = document.getElementById('map-container');
+
+            // Естественные размеры изображения
+            const naturalWidth = mapImg.naturalWidth || mapImg.offsetWidth;
+            const naturalHeight = mapImg.naturalHeight || mapImg.offsetHeight;
+
+            // Размеры контейнера с учетом padding (10px с каждой стороны)
+            const containerWidth = mapContainer.offsetWidth - 20;
+            const containerHeight = mapContainer.offsetHeight - 20;
+
+            if (naturalWidth > 0 && naturalHeight > 0 && containerWidth > 0 && containerHeight > 0) {
+                const scaleX = containerWidth / naturalWidth;
+                const scaleY = containerHeight / naturalHeight;
+
+                // Выбираем масштаб, при котором вся карта помещается в окно
+                const fitZoom = Math.min(scaleX, scaleY);
+
+                mapZoom = Math.max(minZoom, Math.min(maxZoom, fitZoom));
+            } else {
+                // Запасной вариант, если размеры не определены
+                mapZoom = 1;
+            }
+
+            // Сбрасываем панорамирование и центрируем карту
             panX = 0;
             panY = 0;
+            constrainPan();
             updateMapTransform();
-            updateMap(); // Обновляем маркеры с размером по умолчанию
+            updateMap(); // Обновляем маркеры с новым масштабом
         }
 
         function constrainPan() {
