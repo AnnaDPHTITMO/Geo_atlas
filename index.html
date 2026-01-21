@@ -525,73 +525,333 @@
         //   Чтобы узнать пиксельные координаты, наведите мышь на карту - они отображаются в координатном дисплее
         //
         const objectsData = {
-            'Система координат': [
-                { name: 'Северный полюс', x: 570, y: 18, type: 'точка' },
-                { name: 'Южный полюс', x: 570, y: 680, type: 'точка' },
-                { name: 'Экватор', lat: 0, lon: 40, type: 'линия' },
-                { name: 'Нулевой меридиан', lat: 0, lon: 0, type: 'линия' },
-                { name: 'Северный тропик', lat: 23.5, lon: 40, type: 'линия' },
-                { name: 'Южный тропик', lat: -23.5, lon: 40, type: 'линия' },
-                { name: 'Северный полярный круг', lat: 66.5, lon: 40, type: 'линия' },
-                { name: 'Южный полярный круг', lat: -66.5, lon: 40, type: 'линия' }
-            ],
-            'Материки': [
-                { name: 'Евразия', lat: 50, lon: 80, type: 'материк' },
-                { name: 'Африка', lat: 0, lon: 20, type: 'материк' },
-                { name: 'Северная Америка', lat: 45, lon: -95, type: 'материк' },
-                { name: 'Южная Америка', lat: -15, lon: -60, type: 'материк' },
-                { name: 'Австралия', lat: -25, lon: 133, type: 'материк' },
-                { name: 'Антарктида', lat: -82, lon: 40, type: 'материк' }
-            ],
-            'Части света': [
-                { name: 'Европа', lat: 50, lon: 25, type: 'часть света' },
-                { name: 'Азия', lat: 50, lon: 100, type: 'часть света' },
-                { name: 'Америка', lat: 15, lon: -80, type: 'часть света' },
-                { name: 'Африка', lat: 0, lon: 20, type: 'часть света' },
-                { name: 'Австралия и Океания', lat: -25, lon: 150, type: 'часть света' },
-                { name: 'Антарктида', lat: -82, lon: 0, type: 'часть света' }
-            ],
-            'Океаны': [
-                { name: 'Северный Ледовитый океан', lat: 82, lon: 40, type: 'океан' },
-                { name: 'Атлантический океан', lat: 20, lon: -35, type: 'океан' },
-                { name: 'Тихий океан', lat: 10, lon: -155, type: 'океан' },
-                { name: '~Тихий океан западный', lat: 10, lon: -120, type: 'океан' },
-                { name: 'Индийский океан', lat: -20, lon: 70, type: 'океан' },
-                { name: 'Южный океан', lat: -70, lon: 40, type: 'океан' }
-            ],
-            'Горы и равнины': [
-                { name: 'Уральские горы', x: 614, y: 124, type: 'горы' },
-                { name: 'Кавказские горы', x: 577, y: 189, type: 'горы' },
-                { name: 'Альпы', x: 484, y: 174, type: 'горы' },
-                { name: 'Гималаи', lat: 28, lon: 84, type: 'горы' },
-                { name: 'Кордильеры', x: 154, y: 145, type: 'горы' },
-                { name: 'Анды', lat: -20, lon: -70, type: 'горы' },
-                { name: 'Восточно-Европейская равнина', x: 538, y: 143, type: 'равнина' },
-                { name: 'Западно-Сибирская равнина', x: 651, y: 114, type: 'равнина' }
-            ],
-            'Реки и озёра': [
-                { name: 'Волга', x: 581, y: 165, type: 'река' },
-                { name: 'Обь', x: 627, y: 107, type: 'река' },
-                { name: 'Енисей', x: 668, y: 83, type: 'река' },
-                { name: 'Лена', x: 753, y: 77, type: 'река' },
-                { name: 'Амур', x: 822, y: 139, type: 'река' },
-                { name: 'Нил', x: 544, y: 245, type: 'река' },
-                { name: 'Амазонка', lat: -5, lon: -63, type: 'река' },
-                { name: 'Миссисипи', x: 185, y: 209, type: 'река' },
-                { name: 'оз. Байкал', x: 743, y: 134, type: 'озеро' },
-                { name: 'Ладожское озеро', x: 549, y: 120, type: 'озеро' },
-                { name: 'Онежское озеро', x: 559, y: 117, type: 'озеро' }
-            ],
-            'Моря': [
-                { name: 'Чёрное море', x: 555, y: 188, type: 'море' },
-                { name: 'Каспийское море', x: 598, y: 192, type: 'море' },
-                { name: 'Балтийское море', x: 517, y: 137, type: 'море' },
-                { name: 'Белое море', x: 566, y: 104, type: 'море' },
-                { name: 'Баренцево море', x: 570, y: 64, type: 'море' },
-                { name: 'Средиземное море', lat: 35, lon: 18, type: 'море' },
-                { name: 'Карибское море', lat: 15, lon: -75, type: 'море' }
-            ]
-        };
+  "Система координат": [
+    {
+      "name": "Северный полюс",
+      "x": 893,
+      "y": 28,
+      "type": "точка"
+    },
+    {
+      "name": "Южный полюс",
+      "x": 893,
+      "y": 1057,
+      "type": "точка"
+    },
+    {
+      "name": "Экватор",
+      "lat": 0,
+      "lon": 40,
+      "type": "линия"
+    },
+    {
+      "name": "Нулевой меридиан",
+      "lat": 0,
+      "lon": 0,
+      "type": "линия"
+    },
+    {
+      "name": "Северный тропик",
+      "lat": 23.5,
+      "lon": 40,
+      "type": "линия"
+    },
+    {
+      "name": "Южный тропик",
+      "lat": -23.5,
+      "lon": 40,
+      "type": "линия"
+    },
+    {
+      "name": "Северный полярный круг",
+      "lat": 66.5,
+      "lon": 40,
+      "type": "линия"
+    },
+    {
+      "name": "Южный полярный круг",
+      "lat": -66.5,
+      "lon": 40,
+      "type": "линия"
+    }
+  ],
+  "Материки": [
+    {
+      "name": "Евразия",
+      "lat": 50,
+      "lon": 80,
+      "type": "материк"
+    },
+    {
+      "name": "Африка",
+      "lat": 0,
+      "lon": 20,
+      "type": "материк"
+    },
+    {
+      "name": "Северная Америка",
+      "lat": 45,
+      "lon": -95,
+      "type": "материк"
+    },
+    {
+      "name": "Южная Америка",
+      "lat": -15,
+      "lon": -60,
+      "type": "материк"
+    },
+    {
+      "name": "Австралия",
+      "lat": -25,
+      "lon": 133,
+      "type": "материк"
+    },
+    {
+      "name": "Антарктида",
+      "lat": -82,
+      "lon": 40,
+      "type": "материк"
+    }
+  ],
+  "Части света": [
+    {
+      "name": "Европа",
+      "lat": 50,
+      "lon": 25,
+      "type": "часть света"
+    },
+    {
+      "name": "Азия",
+      "lat": 50,
+      "lon": 100,
+      "type": "часть света"
+    },
+    {
+      "name": "Америка",
+      "lat": 15,
+      "lon": -80,
+      "type": "часть света"
+    },
+    {
+      "name": "Африка",
+      "lat": 0,
+      "lon": 20,
+      "type": "часть света"
+    },
+    {
+      "name": "Австралия и Океания",
+      "lat": -25,
+      "lon": 150,
+      "type": "часть света"
+    },
+    {
+      "name": "Антарктида",
+      "lat": -82,
+      "lon": 0,
+      "type": "часть света"
+    }
+  ],
+  "Океаны": [
+    {
+      "name": "Северный Ледовитый океан",
+      "lat": 82,
+      "lon": 40,
+      "type": "океан"
+    },
+    {
+      "name": "Атлантический океан",
+      "lat": 20,
+      "lon": -35,
+      "type": "океан"
+    },
+    {
+      "name": "Тихий океан",
+      "lat": 10,
+      "lon": -155,
+      "type": "океан"
+    },
+    {
+      "name": "~Тихий океан западный",
+      "lat": 10,
+      "lon": -120,
+      "type": "океан"
+    },
+    {
+      "name": "Индийский океан",
+      "lat": -20,
+      "lon": 70,
+      "type": "океан"
+    },
+    {
+      "name": "Южный океан",
+      "lat": -70,
+      "lon": 40,
+      "type": "океан"
+    }
+  ],
+  "Горы и равнины": [
+    {
+      "name": "Уральские горы",
+      "x": 961,
+      "y": 193,
+      "type": "горы"
+    },
+    {
+      "name": "Кавказские горы",
+      "x": 904,
+      "y": 294,
+      "type": "горы"
+    },
+    {
+      "name": "Альпы",
+      "x": 758,
+      "y": 270,
+      "type": "горы"
+    },
+    {
+      "name": "Гималаи",
+      "lat": 28,
+      "lon": 84,
+      "type": "горы"
+    },
+    {
+      "name": "Кордильеры",
+      "x": 241,
+      "y": 225,
+      "type": "горы"
+    },
+    {
+      "name": "Анды",
+      "lat": -20,
+      "lon": -70,
+      "type": "горы"
+    },
+    {
+      "name": "Восточно-Европейская равнина",
+      "x": 842,
+      "y": 222,
+      "type": "равнина"
+    },
+    {
+      "name": "Западно-Сибирская равнина",
+      "x": 1019,
+      "y": 177,
+      "type": "равнина"
+    }
+  ],
+  "Реки и озёра": [
+    {
+      "name": "Волга",
+      "x": 910,
+      "y": 256,
+      "type": "река"
+    },
+    {
+      "name": "Обь",
+      "x": 982,
+      "y": 166,
+      "type": "река"
+    },
+    {
+      "name": "Енисей",
+      "x": 1046,
+      "y": 129,
+      "type": "река"
+    },
+    {
+      "name": "Лена",
+      "x": 1179,
+      "y": 120,
+      "type": "река"
+    },
+    {
+      "name": "Амур",
+      "x": 1287,
+      "y": 216,
+      "type": "река"
+    },
+    {
+      "name": "Нил",
+      "x": 852,
+      "y": 381,
+      "type": "река"
+    },
+    {
+      "name": "Амазонка",
+      "lat": -5,
+      "lon": -63,
+      "type": "река"
+    },
+    {
+      "name": "Миссисипи",
+      "x": 290,
+      "y": 325,
+      "type": "река"
+    },
+    {
+      "name": "оз. Байкал",
+      "x": 1163,
+      "y": 208,
+      "type": "озеро"
+    },
+    {
+      "name": "Ладожское озеро",
+      "x": 860,
+      "y": 186,
+      "type": "озеро"
+    },
+    {
+      "name": "Онежское озеро",
+      "x": 875,
+      "y": 182,
+      "type": "озеро"
+    }
+  ],
+  "Моря": [
+    {
+      "name": "Чёрное море",
+      "x": 869,
+      "y": 292,
+      "type": "море"
+    },
+    {
+      "name": "Каспийское море",
+      "x": 936,
+      "y": 298,
+      "type": "море"
+    },
+    {
+      "name": "Балтийское море",
+      "x": 810,
+      "y": 213,
+      "type": "море"
+    },
+    {
+      "name": "Белое море",
+      "x": 886,
+      "y": 162,
+      "type": "море"
+    },
+    {
+      "name": "Баренцево море",
+      "x": 893,
+      "y": 99,
+      "type": "море"
+    },
+    {
+      "name": "Средиземное море",
+      "lat": 35,
+      "lon": 18,
+      "type": "море"
+    },
+    {
+      "name": "Карибское море",
+      "lat": 15,
+      "lon": -75,
+      "type": "море"
+    }
+  ]
+};
 
         // Функция для преобразования координат в пиксели на карте
         function coordsToPixels(lat, lon, svgWidth, svgHeight) {
@@ -693,35 +953,30 @@
         function constrainPan() {
             const mapImg = document.getElementById('world-map');
             const mapContainer = document.getElementById('map-container');
-            
-            // Получаем естественные размеры изображения
-            const naturalWidth = mapImg.naturalWidth || mapImg.offsetWidth;
-            const naturalHeight = mapImg.naturalHeight || mapImg.offsetHeight;
-            
+            // Фактический размер изображения на экране
+            const imgRect = mapImg.getBoundingClientRect();
             // Размеры контейнера с учетом padding (10px с каждой стороны)
             const containerWidth = mapContainer.offsetWidth - 20;
             const containerHeight = mapContainer.offsetHeight - 20;
-            
-            // Масштабированные размеры
-            const scaledWidth = naturalWidth * mapZoom;
-            const scaledHeight = naturalHeight * mapZoom;
-            
-            // Если карта меньше контейнера, центрируем её
+    
+            const scaledWidth = imgRect.width;
+            const scaledHeight = imgRect.height;
+    
             if (scaledWidth <= containerWidth) {
-                panX = (containerWidth - scaledWidth) / 2;
-            } else {
-                // Ограничиваем панорамирование, чтобы не выходить за границы
-                const maxPanX = (scaledWidth - containerWidth) / 2;
-                panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
-            }
-            
-            if (scaledHeight <= containerHeight) {
-                panY = (containerHeight - scaledHeight) / 2;
-            } else {
-                const maxPanY = (scaledHeight - containerHeight) / 2;
-                panY = Math.max(-maxPanY, Math.min(maxPanY, panY));
-            }
-        }
+            panX = 0;
+    } else {
+        const maxPanX = (scaledWidth - containerWidth) / 2;
+        panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
+    }
+    
+    if (scaledHeight <= containerHeight) {
+        panY = 0;
+    } else {
+        const maxPanY = (scaledHeight - containerHeight) / 2;
+        panY = Math.max(-maxPanY, Math.min(maxPanY, panY));
+    }
+}
+        
 
         function updateMapTransform() {
             const mapImg = document.getElementById('world-map');
@@ -990,9 +1245,13 @@
             const svg = document.getElementById('markers-svg');
             
             // Получаем размеры SVG
-            const rect = mapContainer.getBoundingClientRect();
-            const svgWidth = mapImg.offsetWidth;
-            const svgHeight = mapImg.offsetHeight;
+            //const rect = mapContainer.getBoundingClientRect();
+            //const svgWidth = mapImg.offsetWidth;
+            //const svgHeight = mapImg.offsetHeight;
+
+            // Use natural image size as map coordinate system
+            const svgWidth = mapImg.naturalWidth || 1782;
+            const svgHeight = mapImg.naturalHeight || 1080;
 
             svg.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
             svg.setAttribute('width', svgWidth);
@@ -1263,7 +1522,7 @@
         // Обновляем размеры при изменении размера окна
         window.addEventListener('resize', () => {
             setTimeout(() => {
-                refreshView();
+                //refreshView();
                 constrainPan();
                 updateMapTransform();
             }, 100);
